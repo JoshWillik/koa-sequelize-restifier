@@ -1,0 +1,19 @@
+{
+  "name": "koa-sequelize-restifier",
+  "version": "0.1.0",
+  "description": "A restifier for sequelize models",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JoshWillik/koa-sequelize-restifier.git"
+  },
+  "author": "Josh Vanderwillik",
+  "license": "Property of Josh Vanderwillik",
+  "bugs": {
+    "url": "https://github.com/JoshWillik/koa-sequelize-restifier/issues"
+  },
+  "homepage": "https://github.com/JoshWillik/koa-sequelize-restifier"
+}
