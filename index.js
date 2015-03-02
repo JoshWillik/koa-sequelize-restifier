@@ -1,9 +1,5 @@
-var _ = require( 'lodash' )
 var inflection = require( 'inflection' )
 function Restifier( options ){
-  this.options = _.extend({
-
-  }, options )
   this.routes = {}
 }
 

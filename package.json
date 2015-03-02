@@ -1,6 +1,6 @@
 {
   "name": "koa-sequelize-restifier",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A restifier for sequelize models",
   "main": "index.js",
   "scripts": {
@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/JoshWillik/koa-sequelize-restifier/issues"
   },
-  "homepage": "https://github.com/JoshWillik/koa-sequelize-restifier"
+  "homepage": "https://github.com/JoshWillik/koa-sequelize-restifier",
+  "dependencies": {
+    "inflection": "^1.6.0"
+  }
 }
