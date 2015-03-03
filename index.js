@@ -67,7 +67,6 @@ function _makeGetOne( model ){
       var id = this.params.id
       var record = yield model.find( id )
       if( !record ){
-        record = {}
         this.status = 404
         this.body = {
           meta: {
@@ -75,6 +74,7 @@ function _makeGetOne( model ){
             error: 'Record ' + id + ' not found'
           }
         }
+        return
       }
       this.body = {
         meta: {
