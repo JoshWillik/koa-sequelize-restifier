@@ -64,10 +64,17 @@ function _makeGetAll( model ){
 function _makeGetOne( model ){
   return function*(){
     try {
-      var record = yield model.find( this.params.id )
+      var id = this.params.id
+      var record = yield model.find( id )
       if( !record ){
         record = {}
         this.status = 404
+        this.body = {
+          meta: {
+            status: 'error',
+            error: 'Record ' + id + ' not found'
+          }
+        }
       }
       this.body = {
         meta: {
@@ -76,11 +83,11 @@ function _makeGetOne( model ){
         data: record
       }
     } catch( e ){
-      this.status = 500
+      this.status = 400
       this.body = {
         meta: {
           status: 'error',
-          error: 'Could not fetch record'
+          error: e.message
         }
       }
     }
