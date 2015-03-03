@@ -51,7 +51,7 @@ function _makeGetAll( model ){
 
 function _makeGetOne( model ){
   return function*(){
-    var record = yield model.find( req.params.id )
+    var record = yield model.find( this.params.id )
     this.body = {
       meta: {},
       data: record
@@ -60,8 +60,8 @@ function _makeGetOne( model ){
 }
 
 function _makeCreateOne( model ){
-  return function*( req, res ){
-    var values = req.body
+  return function*(){
+    var values = this.request.body
     var record = yield model.create( values )
     this.status = 201
     this.body = {
@@ -72,9 +72,9 @@ function _makeCreateOne( model ){
 }
 
 function _makePatchOne( model ){
-  return function*( req, res ){
-    var values = req.body
-    var record = yield model.find( req.params.id )
+  return function*(){
+    var values = this.request.body
+    var record = yield model.find( this.params.id )
     var updated = yield record.updateAttributes( values )
     this.body = {
       meta: {},
@@ -84,8 +84,8 @@ function _makePatchOne( model ){
 }
 
 function _makeDeleteOne( model ){
-  return function*( req, res ){
-    var record = yield model.find( req.params.id )
+  return function*(){
+    var record = yield model.find( this.params.id )
     yield record.destroy()
     this.body = {
       meta: {},
