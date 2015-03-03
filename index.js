@@ -39,22 +39,50 @@ Restifier.prototype = {
 
 function _makeGetAll( model ){
   return function*(){
-    var records = yield model.findAll()
-    this.body = {
-      meta: {
-        count: records.length
-      },
-      data: records
+    try {
+      var records = yield model.findAll()
+      records = records || []
+      this.body = {
+        meta: {
+          count: records.length,
+          status: 'ok'
+        },
+        data: records
+      }
+    } catch( e ){
+      this.status = 500
+      this.body = {
+        meta: {
+          status: 'error',
+          message: e.message
+        }
+      }
     }
   }
 }
 
 function _makeGetOne( model ){
   return function*(){
-    var record = yield model.find( this.params.id )
-    this.body = {
-      meta: {},
-      data: record
+    try {
+      var record = yield model.find( this.params.id )
+      if( !record ){
+        record = {}
+        this.status = 404
+      }
+      this.body = {
+        meta: {
+          status: 'ok'
+        },
+        data: record
+      }
+    } catch( e ){
+      this.status = 500
+      this.body = {
+        meta: {
+          status: 'error',
+          error: 'Could not fetch record'
+        }
+      }
     }
   }
 }
@@ -62,10 +90,20 @@ function _makeGetOne( model ){
 function _makeCreateOne( model ){
   return function*(){
     var values = this.request.body
+    if( !values ){
+      this.status = 400
+      this.body = {
+        status: 'error',
+        message: 'Request is empty'
+      }
+      return
+    }
     var record = yield model.create( values )
     this.status = 201
     this.body = {
-      meta: {},
+      meta: {
+        status: 'ok'
+      },
       data: record
     }
   }
@@ -74,10 +112,31 @@ function _makeCreateOne( model ){
 function _makePatchOne( model ){
   return function*(){
     var values = this.request.body
-    var record = yield model.find( this.params.id )
+    if( !values ){
+      this.status = 400
+      this.body = {
+        meta: {
+          status: 'error',
+          error: 'Request is empty'
+        }
+      }
+      return
+    }
+
+    var id = this.params.id
+    var record = yield model.find( id )
+    if( !record ){
+      this.status = 404
+      this.body = {
+        status: 'error',
+        error: 'Record ' + id + ' not found'
+      }
+    }
     var updated = yield record.updateAttributes( values )
     this.body = {
-      meta: {},
+      meta: {
+        status: 'ok'
+      },
       data: updated
     }
   }
@@ -85,11 +144,33 @@ function _makePatchOne( model ){
 
 function _makeDeleteOne( model ){
   return function*(){
-    var record = yield model.find( this.params.id )
-    yield record.destroy()
-    this.body = {
-      meta: {},
-      data: record
+    var id = this.params.id
+    try {
+      var record = yield model.find( id )
+      if( !record ){
+        this.status = 404
+        this.body = {
+          meta: {
+            status: 'error',
+            error: 'Record ' + id + ' not found'
+          }
+        }
+      }
+      yield record.destroy()
+      this.body = {
+        meta: {
+          status: 'ok'
+        },
+        data: record
+      }
+    } catch( e ){
+      this.status = 500
+      this.body = {
+        meta: {
+          status: 'error',
+          error: e.message
+        }
+      }
     }
   }
 }
