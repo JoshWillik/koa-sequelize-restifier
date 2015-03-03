@@ -31,7 +31,6 @@ Restifier.prototype = {
 
 
     this.routes[ plural + '_url' ] = '/' + plural
-    // this.routes[ 'single_' + single + '_url' ] = pluralUrl
   },
   getRegisteredRoutes: function(){
     return this.routes
@@ -39,24 +38,24 @@ Restifier.prototype = {
 }
 
 function _makeGetAll( model ){
-  return function*( req, res ){
+  return function*(){
     var records = yield model.findAll()
-    res.send({
+    this.body = {
       meta: {
         count: records.length
       },
       data: records
-    })
+    }
   }
 }
 
 function _makeGetOne( model ){
-  return function*( req, res ){
+  return function*(){
     var record = yield model.find( req.params.id )
-    res.send({
+    this.body = {
       meta: {},
       data: record
-    })
+    }
   }
 }
 
@@ -64,10 +63,11 @@ function _makeCreateOne( model ){
   return function*( req, res ){
     var values = req.body
     var record = yield model.create( values )
-    res.status( 201 ).send({
+    this.status = 201
+    this.body = {
       meta: {},
       data: record
-    })
+    }
   }
 }
 
@@ -76,10 +76,10 @@ function _makePatchOne( model ){
     var values = req.body
     var record = yield model.find( req.params.id )
     var updated = yield record.updateAttributes( values )
-    res.send({
+    this.body = {
       meta: {},
       data: updated
-    })
+    }
   }
 }
 
@@ -87,10 +87,10 @@ function _makeDeleteOne( model ){
   return function*( req, res ){
     var record = yield model.find( req.params.id )
     yield record.destroy()
-    res.send({
+    this.body = {
       meta: {},
       data: record
-    })
+    }
   }
 }
 
