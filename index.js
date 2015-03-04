@@ -90,6 +90,7 @@ function _makeGetOne( model ){
           error: e.message
         }
       }
+      return
     }
   }
 }
@@ -105,13 +106,24 @@ function _makeCreateOne( model ){
       }
       return
     }
-    var record = yield model.create( values )
-    this.status = 201
-    this.body = {
-      meta: {
-        status: 'ok'
-      },
-      data: record
+    try {
+      var record = yield model.create( values )
+      this.status = 201
+      this.body = {
+        meta: {
+          status: 'ok'
+        },
+        data: record
+      }
+    } catch( e ){
+      this.status = 500
+      this.body = {
+        meta: {
+          status: 'error',
+          error: e.message
+        }
+      }
+      return
     }
   }
 }
