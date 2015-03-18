@@ -123,7 +123,7 @@ function _makeCreateOne( model ){
           error: e.message
         }
       }
-      return
+      this.error = e
     }
   }
 }
@@ -190,6 +190,7 @@ function _makeDeleteOne( model ){
           error: e.message
         }
       }
+      this.error = e
     }
   }
 }
