@@ -17,7 +17,7 @@ Restifier.prototype = {
     var singleUrl = '/' + single + '/:id'
     var pluralUrl = '/' + plural + '/:id'
 
-    var customArgs = [ app, model ]
+    var customArgs = [ model ]
 
     var getAll = valid( options.getAll )?
       options.getAll.apply( this, customArgs ):
