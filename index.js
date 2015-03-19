@@ -9,6 +9,8 @@ function Restifier( options ){
 
 Restifier.prototype = {
   restify: function( app, model, options ){
+    options = options || {}
+
     var single = model.name.toLowerCase()
     var plural = inflection.pluralize( single )
 
