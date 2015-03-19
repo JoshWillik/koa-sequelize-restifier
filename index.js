@@ -1,39 +1,58 @@
 var inflection = require( 'inflection' )
+function valid( value ){
+  return typeof value === 'function'
+}
+
 function Restifier( options ){
   this.routes = {}
 }
 
 Restifier.prototype = {
-  restify: function( app, model ){
+  restify: function( app, model, options ){
     var single = model.name.toLowerCase()
     var plural = inflection.pluralize( single )
 
     var singleUrl = '/' + single + '/:id'
     var pluralUrl = '/' + plural + '/:id'
 
-    app.get( '/' + plural, _makeGetAll( model ) )
+    var customArgs = [ app, model ]
 
-    var createOne = _makeCreateOne( model )
+    var getAll = valid( options.getAll )?
+      options.getAll.apply( this, customArgs ):
+      _makeGetAll( model )
+    app.get( '/' + plural, getAll )
+
+    var createOne = valid( options.create )?
+      options.create.apply( this, customArgs ):
+     _makeCreateOne( model )
     app.post( '/' + single, createOne )
     app.post( '/' + plural, createOne )
 
-    var getOne = _makeGetOne( model )
+    var getOne = valid( options.get )?
+      options.get.apply( this, customArgs ):
+      _makeGetOne( model )
     app.get( singleUrl, getOne )
     app.get( pluralUrl, getOne )
 
-    var patchOne = _makePatchOne( model )
+    var patchOne = valid( options.patch )?
+      options.patch.apply( this, customArgs ):
+      _makePatchOne( model )
     app.patch( singleUrl, patchOne )
     app.patch( pluralUrl, patchOne )
 
-    var deleteOne = _makeDeleteOne( model )
+    var deleteOne = valid( options.delete )?
+      options.delete( this, customArgs ):
+      _makeDeleteOne( model )
     app.delete( singleUrl, deleteOne )
     app.delete( pluralUrl, deleteOne )
 
-
-    this.routes[ plural + '_url' ] = '/' + plural
+    this.registerResourceUrl( plural + '_url', '/' + plural )
   },
   getRegisteredRoutes: function(){
     return this.routes
+  },
+  registerResourceUrl: function( name, url ){
+    this.routes[ name ] = url
   }
 }
 
