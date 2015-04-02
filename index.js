@@ -3,7 +3,15 @@ function valid( value ){
   return typeof value === 'function'
 }
 
+function setSelfUrl( url ){
+  return function* selfLinkMiddleware( next ){
+    yield next
+    this.body.meta.selfUrl = url
+  }
+}
+
 function Restifier( options ){
+  this.options = options
   this.routes = {}
 }
 
@@ -11,42 +19,38 @@ Restifier.prototype = {
   restify: function( app, model, options ){
     options = options || {}
 
-    var single = model.name.toLowerCase()
-    var plural = inflection.pluralize( single )
-
-    var singleUrl = '/' + single + '/:id'
-    var pluralUrl = '/' + plural + '/:id'
+    var plural = inflection.pluralize( model.name.toLowerCase() )
+    var url = {
+      all: '/' + plural,
+      one: '/' + plural + '/:id'
+    }
 
     var customArgs = [ model ]
 
     var getAll = valid( options.getAll )?
       options.getAll.apply( this, customArgs ):
       _makeGetAll( model )
-    app.get( '/' + plural, getAll )
+    app.get( url.all, setSelfUrl( url.all ), getAll )
 
     var createOne = valid( options.create )?
       options.create.apply( this, customArgs ):
      _makeCreateOne( model )
-    app.post( '/' + single, createOne )
-    app.post( '/' + plural, createOne )
+    app.post( url.one, setSelfUrl( url.one ), createOne )
 
     var getOne = valid( options.get )?
       options.get.apply( this, customArgs ):
       _makeGetOne( model )
-    app.get( singleUrl, getOne )
-    app.get( pluralUrl, getOne )
+    app.get( url.one, getOne )
 
     var patchOne = valid( options.patch )?
       options.patch.apply( this, customArgs ):
       _makePatchOne( model )
-    app.patch( singleUrl, patchOne )
-    app.patch( pluralUrl, patchOne )
+    app.patch( url.one, patchOne )
 
     var deleteOne = valid( options.delete )?
       options.delete( this, customArgs ):
       _makeDeleteOne( model )
-    app.delete( singleUrl, deleteOne )
-    app.delete( pluralUrl, deleteOne )
+    app.delete( url.plural, deleteOne )
 
     this.registerResourceUrl( plural + '_url', '/' + plural )
   },
