@@ -3,15 +3,8 @@ function valid( value ){
   return typeof value === 'function'
 }
 
-function setSelfUrl( url ){
-  return function* selfLinkMiddleware( next ){
-    yield next
-    this.body.meta.selfUrl = url
-  }
-}
-
 function Restifier( options ){
-  this.options = options
+  this.options = options || {}
   this.routes = {}
 }
 
@@ -22,13 +15,8 @@ Restifier.prototype = {
     var plural = inflection.pluralize( model.name.toLowerCase() )
     var url = {
       all: '/' + plural,
-      one: '/' + plural + '/:id',
-      absoluteAll: ( this.options.domain || '' ) + '/' + plural,
-      absoluteOne: ( this.options.domain || '' ) + '/' + plural + '/:id',
+      one: '/' + plural + '/:id'
     }
-
-    app.all( url.all, setSelfUrl( url.absoluteAll ) )
-    app.all( url.one, setSelfUrl( url.absoluteOne ) )
 
     var customArgs = [ model ]
 
@@ -37,15 +25,15 @@ Restifier.prototype = {
       _makeGetAll( model )
     app.get( url.all, getAll )
 
-    var createOne = valid( options.create )?
+    var create = valid( options.create )?
       options.create.apply( this, customArgs ):
-     _makeCreateOne( model )
-    app.post( url.one, createOne )
+     _makeCreate( model )
+    app.post( url.all, create )
 
     var getOne = valid( options.get )?
       options.get.apply( this, customArgs ):
       _makeGetOne( model )
-    app.get( url.one, getOne )
+    app.get( url.one, url.one, getOne )
 
     var patchOne = valid( options.patch )?
       options.patch.apply( this, customArgs ):
@@ -69,8 +57,13 @@ Restifier.prototype = {
 
 function _makeGetAll( model ){
   return function*(){
+    var offset = this.query.offset || 0
+    var limit = this.query.count || 20
     try {
-      var records = yield model.findAll()
+      var records = yield model.findAll({
+        offset: offset,
+        limit: limit
+      })
       records = records || []
       this.body = {
         meta: {
@@ -125,7 +118,7 @@ function _makeGetOne( model ){
   }
 }
 
-function _makeCreateOne( model ){
+function _makeCreate( model ){
   return function*(){
     var values = this.request.body
     if( !values ){
