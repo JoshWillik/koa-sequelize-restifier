@@ -55,7 +55,7 @@ Restifier.prototype = {
     var deleteOne = valid( options.delete )?
       options.delete( this, customArgs ):
       _makeDeleteOne( model )
-    app.delete( url.plural, deleteOne )
+    app.delete( url.one, deleteOne )
 
     this.registerResourceUrl( plural + '_url', '/' + plural )
   },
