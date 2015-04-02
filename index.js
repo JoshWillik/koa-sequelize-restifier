@@ -22,20 +22,25 @@ Restifier.prototype = {
     var plural = inflection.pluralize( model.name.toLowerCase() )
     var url = {
       all: '/' + plural,
-      one: '/' + plural + '/:id'
+      one: '/' + plural + '/:id',
+      absoluteAll: ( this.options.domain || '' ) + '/' + plural,
+      absoluteOne: ( this.options.domain || '' ) + '/' + plural + '/:id',
     }
+
+    app.all( url.all, setSelfUrl( url.absoluteAll ) )
+    app.all( url.one, setSelfUrl( url.absoluteOne ) )
 
     var customArgs = [ model ]
 
     var getAll = valid( options.getAll )?
       options.getAll.apply( this, customArgs ):
       _makeGetAll( model )
-    app.get( url.all, setSelfUrl( url.all ), getAll )
+    app.get( url.all, getAll )
 
     var createOne = valid( options.create )?
       options.create.apply( this, customArgs ):
      _makeCreateOne( model )
-    app.post( url.one, setSelfUrl( url.one ), createOne )
+    app.post( url.one, createOne )
 
     var getOne = valid( options.get )?
       options.get.apply( this, customArgs ):
