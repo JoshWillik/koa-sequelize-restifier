@@ -1,6 +1,6 @@
 {
   "name": "koa-sequelize-restifier",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "A restifier for sequelize models",
   "main": "index.js",
   "scripts": {

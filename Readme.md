@@ -17,9 +17,9 @@ var restifier = new Restifier()
 
 restifier.restify( router, Job )
 // Maps the following urls
-//   GET   /jobs
-//   GET   /jobs/:id
+//   GET    /jobs
 //   POST   /jobs
+//   GET    /jobs/:id
 //   PATCH  /jobs/:id
 //   DELETE /jobs/:id
 

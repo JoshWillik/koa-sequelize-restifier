@@ -1,4 +1,3 @@
-var inflection = require( 'inflection' )
 function valid( value ){
   return typeof value === 'function'
 }
@@ -12,7 +11,7 @@ Restifier.prototype = {
   restify: function( app, model, options ){
     options = options || {}
 
-    var plural = inflection.pluralize( model.name.toLowerCase() )
+    var plural = model.options.name.plural
     var url = {
       all: '/' + plural,
       one: '/' + plural + '/:id'
