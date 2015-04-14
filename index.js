@@ -11,7 +11,7 @@ Restifier.prototype = {
   restify: function( app, model, options ){
     options = options || {}
 
-    var plural = model.options.name.plural
+    var plural = model.options.name.plural.toLowerCase()
     var url = {
       all: '/' + plural,
       one: '/' + plural + '/:id'
